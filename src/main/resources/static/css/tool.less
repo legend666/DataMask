@@ -1,0 +1,44 @@
+/**
+*作者：焦凯旋
+*时间：2017-08-08
+*描述：
+**/
+
+// Mixin
+//清除浮动
+.clearfix() {
+    &:before,
+    &:after {
+        content: " ";
+        display: table;
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+//圆角
+.rounded-corners(@radius: 50%) {
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    border-radius: @radius;
+}
+//边距
+.bd-all(@color:@base-color){
+    border: 1px solid @color;
+}
+.bd-tp(@color:@base-color){
+    border-top: 1px solid @color;
+}
+.bd-bt(@color:@base-color){
+    border-bottom: 1px solid @color;
+}
+.bd-lf(@color:@base-color){
+    border-left: 1px solid @color;
+}
+.bd-rt(@color:@base-color){
+    border-right: 1px solid @color;
+}
+
+@ft-tit: 18px;
+@base-color: #6bc8ff;

@@ -1,0 +1,128 @@
+@import "tool.less";
+.m-wrap {
+    width: 1086px;
+    margin: 0;
+//  background: url(../images/bg.png) no-repeat;
+}
+
+.m-wrapc {
+    padding: 0 30px;
+}
+
+.topbar {
+    background: #002d8a;
+    ul {
+        .clearfix();
+        li {
+            display: block;
+            float: left;
+            height: 140px;
+            width: 16.66%;
+            .txtWrap {
+                padding: 35px 0 0 50px;
+            }
+            h1 {
+                color: #FFFFFF;
+                font-size: 36px;
+                font-weight: normal;
+                margin: 0 0 10px 0;
+            }
+            h2 {
+                color: #73c2fd;
+                font-size: 16px;
+                font-weight: normal;
+            }
+            &.line {
+                background: url(../images/topbar_line.png) no-repeat right center;
+            }
+        }
+    }
+}
+
+.newsbar {
+    border: 1px solid #DDDDDD;
+    .clearfix();
+    .newsbarc {
+        float: left;
+        width: 33.3%;
+        background: #FFFFFF;
+        >.hd {
+            height: 37px;
+            line-height: 37px;
+            padding: 10px 0;
+            font-size: 18px;
+            color: #333333;
+        }
+        >.bd {
+            padding: 10px 20px;
+        }
+        &.bg1 {
+            background: url(../images/newsbarc_bg1.png);
+            background-color: #FFFFFF;
+        }
+        &.bg2 {
+            background: #f2f5f8;
+        }
+    }
+}
+
+.newslist1 {
+    ul {
+        li {
+            .clearfix();
+            padding: 0 0 0 15px;
+            background: url(../images/newslist_square.png) no-repeat left 10px;
+            .title {
+                float: left;
+                font-size: 14px;
+                color: #333333;
+                line-height: 25px;
+            }
+            .date {
+                float: right;
+                margin: 10px 0;
+                font-size: 12px;
+                color: #FFFFFF;
+                padding: 5px 10px;
+                background: #91d9e6;
+                &.bg1 {
+                    background: #96b5e9;
+                }
+                &.bg2 {
+                    background: #aea9d5;
+                }
+            }
+            &.bg2{
+                background: url(../images/newslist_square2.png) no-repeat left 10px;
+            }
+            &.bg3{
+                background: url(../images/newslist_square3.png) no-repeat left 10px;
+            }
+            &.bdline {
+                border-bottom: 1px dashed #c1c7cf;
+            }
+        }
+    }
+}
+
+.table-grey {
+    border: 0;
+    th {
+        color: #002d8a;
+        text-align: center;
+        font-weight: bold;
+        background: #eef1f4;
+    }
+    td {
+        color: #333333;
+        background: #FFFFFF;
+    }
+}
+
+.page-grey {
+    .ui-page-next,
+    .ui-page-last,
+    .ui-button-go {
+        background: #014bb0;
+    }
+}

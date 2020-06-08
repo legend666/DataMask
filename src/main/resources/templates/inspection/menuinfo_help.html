@@ -1,0 +1,72 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="utf-8"/>
+    <title>数据还原</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=IE9"/>
+    <meta http-equiv="Pragma" CONTENT="no-cache"/>
+    <meta http-equiv="Window-target" CONTENT="_top"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <!--<link th:href="@{/css/base.css}" rel="stylesheet" type="text/css"/>-->
+    <!--&lt;!&ndash;   <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}"/> &ndash;&gt;-->
+    <!--<link th:href="@{/css/main_style.css}" rel="stylesheet" type="text/css"/>-->
+    <!--<link rel="stylesheet" type="text/css" th:href="@{/css/function.css}"/>-->
+    <!--<link rel="stylesheet" type="text/css" th:href="@{/css/Validform_style.css}"/>-->
+</head>
+<body>
+系统帮助页面
+<script type="text/javascript" th:src="@{/js/jquery-1.11.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/tplbase.js}"></script>
+<script th:src="@{/js/layer/layer.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" th:src="@{/js/jquery-migrate-1.1.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/Validform_v5.3_min.js}"></script>
+<!-- <script type="text/javascript" th:src="@{/js/Validform_v5.3.js}"></script> -->
+<script th:src="@{/js/DatePicker/WdatePicker.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/js/jquery.SuperSlide.2.1.1.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" th:inline="javascript">
+
+    //tab切换
+    jQuery(".slideTabBox3").slide({
+        trigger: "click"
+    });
+    //折叠层效果
+    $(".fold-title").click(function () {
+        var status = $(this).next(".fold-cont").css("display");
+        if (status != "none") {
+            $(this).next(".fold-cont").slideUp();
+            $(this).find("img").css("transform", "rotate(180deg)");
+            flag2 = 0;
+        } else {
+            $(".fold-cont").not("#first_font").slideUp();
+            $(this).next(".fold-cont").slideDown();
+            $(this).find("img").css("transform", "rotate(0deg)");
+            flag2 = 1;
+        }
+    });
+    $("#long").change(function () {
+        if ($(this).is(":checked")) {
+            $("#hideipt").hide();
+            $("#nian").hide();
+
+            $("#hideipt").val("");
+        }
+    })
+
+
+    function next() {
+        var id = $("#id").val();
+
+        if (id.length == 0) {
+            alert("点击下一页前，请先点击保存按钮，保存信息");
+        } else {
+            window.location.href = "/baseInfoB/baseInfo_next/" + id;
+        }
+
+    }
+
+
+</script>
+</body>
+
+</html>

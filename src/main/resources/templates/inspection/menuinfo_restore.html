@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8">
+    <title>数据还原</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=IE9"/>
+    <meta http-equiv="Pragma" CONTENT="no-cache"/>
+    <meta http-equiv="Window-target" CONTENT="_top"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}" charset="UTF-8"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-ui.min.js}" charset="UTF-8"></script>
+    <script type="text/javascript" th:src="@{/js/i18n/grid.locale-cn.js}" charset="UTF-8"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.jqGrid.min.js}" charset="UTF-8"></script>
+    <link th:href="@{/css/jquery-ui.min.css}" rel="stylesheet" type="text/css" media="screen"/>
+    <link th:href="@{/css/jquery-ui.theme.min.css}" rel="stylesheet" type="text/css" media="screen"/>
+    <link th:href="@{/css/ui.jqgrid.css}" rel="stylesheet" type="text/css" media="screen"/>
+    <script src="http://oss.sheetjs.com/js-xlsx/xlsx.full.min.js"></script>
+    <!-- jqGrid组件基础样式包-必要 -->
+    <link rel="stylesheet" th:href="@{/css/ui.jqgrid.css}"/>
+    <!-- jqGrid主题包-非必要 -->
+    <!-- 在jqgrid/css/css这个目录下还有其他的主题包，可以尝试更换看效果 -->
+    <link rel="stylesheet" th:href="@{/css/jquery-ui-1.8.16.custom.css}"/>
+    <!-- jquery插件包-必要 -->
+    <!-- 这个是所有jquery插件的基础，首先第一个引入 -->
+    <script type="text/javascript" th:src="@{/js/jquery-1.7.1.js}"></script>
+    <!-- jqGrid插件包-必要 -->
+    <script type="text/javascript" th:src="@{/js/jquery.jqGrid.src.js}"></script>
+    <!-- jqGrid插件的多语言包-非必要 -->
+    <!-- 在jqgrid/js/i18n下还有其他的多语言包，可以尝试更换看效果 -->
+    <script type="text/javascript" th:src="@{/js/i18n/grid.locale-cn.js}"></script>
+    <title>http://blog.mn886.net/jqGrid</title>
+    <!-- 本页面初始化用到的js包，创建jqGrid的代码就在里面 -->
+    <script type="text/javascript" th:src="@{/js/restoreData.js}"></script>
+</head>
+<body>
+<div style="height: 40px; background-color: #c2e9ff; border-top:1px solid #000;border-bottom:1px solid #000">
+    <input type="file" id="chooseTms" style="margin-top: 8px; margin-left: 20px" onchange="importf(this)"/>&nbsp;&nbsp;&nbsp;
+    <!--<input type="button" id="saveId" style="margin-top: 8px; margin-left: 20px" value="保存设置" onclick="saveWork()"/>-->
+    <input type="button" id="submitId" style="margin-top: 8px; margin-left: 20px" value="提交任务" onclick="submitWork()"/>
+    <input type="button" id="exportId" style="margin-left: 20px" value="导出文件" onclick="exportExcel()"/>
+</div>
+<div id="cBottomDiv" style="height: 40%; background-color: #b1b815">
+    <table id="restoreData"></table>
+    <table id="excelData"></table>
+</div>
+<div id="demo"></div>
+<div id="demo2"></div>
+<script>
+    Date.prototype.Format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
+    /*
+    FileReader共有4种读取方法：
+    1.readAsArrayBuffer(file)：将文件读取为ArrayBuffer。
+    2.readAsBinaryString(file)：将文件读取为二进制字符串
+    3.readAsDataURL(file)：将文件读取为Data URL
+    4.readAsText(file, [encoding])：将文件读取为文本，encoding缺省值为'UTF-8'
+    */
+    var wb;//读取完成的数据
+    var rABS = false; //是否将文件读取为二进制字符串
+    var dataToExcel;
+    var tableId;
+    var jsonStr;
+    var wopts = {
+        bookType: 'xlsx',
+        bookSST: false,
+        type: 'binary'
+    };
+    var workBook = {
+        SheetNames: ['Sheet1'],
+        Sheets: {},
+        Props: {}
+    };
+
+    function importf(obj) {//导入
+        if (!obj.files) {
+            return;
+        }
+        var f = obj.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var data = e.target.result;
+            if (rABS) {
+                wb = XLSX.read(btoa(fixdata(data)), {//手动转化
+                    type: 'base64'
+                });
+            } else {
+                wb = XLSX.read(data, {
+                    type: 'binary'
+                });
+            }
+            //wb.SheetNames[0]是获取Sheets中第一个Sheet的名字
+            //wb.Sheets[Sheet名]获取第一个Sheet的数据
+            var jsonObject = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            const names = [];
+            const model = [];
+            $.each(jsonObject[0], function (key, value) {
+                names.push(key);
+                model.push({
+                    name: key,
+                    index: key,
+                    autowidth: true,
+                });
+            });
+            if ($("#gbox_restoreData") !== null) {
+                $("#gbox_restoreData").remove();
+            }
+            $(function () {
+                excelData();
+            });
+
+            function excelData() {
+                jQuery("#excelData").jqGrid(
+                    {
+                        datatype: 'local',
+                        loadonce: true,
+                        height: 700,
+                        autowidth: true,
+                        caption: "数据",
+                        colNames: names,
+                        colModel: model,
+                        hidegrid: false,
+                        viewrecords: true,//是否在浏览导航栏显示记录总数
+                        rowNum: 10000,//每页显示记录数
+                        pgbuttons: false,
+                        pgtext: false,
+                    });
+
+            }
+
+            const localData = {page: 1, total: 0, records: "0", rows: jsonObject};
+            localData.rows = jsonObject;
+            localData.records = jsonObject.length;
+            localData.total = (jsonObject.length % 5 === 0) ? (jsonObject.length / 5) : (Math.floor(jsonObject.length / 5) + 1);
+            const reader = {
+                root: function () {
+                    return localData.rows;
+                },
+                page: function () {
+                    return localData.page;
+                },
+                total: function () {
+                    return localData.total;
+                },
+                records: function () {
+                    return localData.records;
+                }, repeatitems: false
+            };
+            $("#excelData").jqGrid('clearGridData');  //清空表格
+            $("#excelData").setGridParam({data: localData.rows, reader: reader}).trigger('reloadGrid');
+            $("#gbox_tableData").remove();
+            $("#restore").append('<table id="excelData"></table>');
+            var jsonString = JSON.stringify(jsonObject);
+            jsonStr = jsonString;
+            //for循环读取内容
+            // var m_str = "";
+            // for (var i = 0; i < 10; i++) {
+            //     var str = "";
+            //     for (var key in jsonObject[i]) {
+            //         str = str + jsonObject[i][key] + ",";
+            //     }
+            //     str = str.slice(0, str.length - 1);
+            //     str = "<p>" + str + "</p>";
+            //     m_str = m_str + str;
+            // }
+            // document.getElementById("demo").innerHTML = m_str;
+        };
+        if (rABS) {
+            reader.readAsArrayBuffer(f);
+        } else {
+            reader.readAsBinaryString(f);
+        }
+    }
+
+    function fixdata(data) { //文件流转BinaryString
+        var o = "",
+            l = 0,
+            w = 10240;
+        for (; l < data.byteLength / w; ++l) o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w, l * w + w)));
+        o += String.fromCharCode.apply(null, new Uint8Array(data.slice(l * w)));
+        return o;
+    }
+
+    //任务保存函数
+    function saveWork() {
+        //同时保存到两个数据表中，且任务表中状态为“未执行”
+        var path = document.getElementById("chooseTms").value;
+        if (path == "" || path == null || path == undefined) {
+            alert("请选择待还原文件");
+            return;
+        }
+        var ctime = new Date().Format('yyyy-MM-dd hh:mm:ss');
+        var taskData = {
+            'pathId': path,
+            'jsonStr': jsonStr,
+            'CreateTime': ctime
+        };
+        $.ajax({
+            url: "/restore/restore_saveTasks",
+            type: "POST",
+            timeout: "3000",
+            async: false,
+            contentType: "application/json",
+            data: JSON.stringify(taskData),    //参数传递为json字符串
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("任务保存失败。");
+            },
+            success: function (data, status) {  //data:servlet返回数据，status:ajax执行状态
+                if (status == 'success') {
+                    tableId = data;
+                } else {
+                    alert("任务保存失败。");
+                }
+            }
+        });
+    }
+
+    //任务提交函数
+    function submitWork() {
+        //先保存再提交
+        saveWork();
+        //做轮询扫表处理,添加ajax请求
+        $.ajax({
+            url: "/restore/restore_submitTasks",
+            type: "POST",
+            timeout: "3000",
+            async: false,
+            contentType: "application/json",
+            data: JSON.stringify({}),    //参数传递为空
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("任务提交失败。");
+            },
+            success: function (data, status) {  //data:servlet返回数据，status:ajax执行状态
+                if (status == 'success') {
+                    alert("任务提交成功。")
+                } else {
+                    alert("任务提交失败。");
+                }
+            }
+        });
+    }
+
+    function resultPreView(data) {
+        //显示脱敏之后的数据
+        var m_str = "";
+        for (var i = 0; i < 10; i++) {
+            var str = "";
+            for (var key in data[i]) {
+                str = str + data[i][key] + ",";
+            }
+            str = str.slice(0, str.length - 1);
+            str = "<p>" + str + "</p>";
+            m_str = m_str + str;
+        }
+        document.getElementById("demo2").innerHTML = m_str;
+    }
+
+    //导出excel XLSX.writeFile
+    function exportExcel() {
+        var path = document.getElementById("chooseTms").value;
+        if (path == "" || path == null || path == undefined) {
+            alert("请选择待还原文件");
+            return;
+        }
+        var taskData = {
+            'tableId': tableId
+        };
+        $.ajax({
+            url: "/restore/restore_getRestoreContents",
+            type: "POST",
+            timeout: "3000",
+            async: false,
+            contentType: "application/json",
+            data: JSON.stringify(taskData),    //参数传递为json字符串
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("获取结果失败。");
+            },
+            success: function (data, status) {  //data:servlet返回数据，status:ajax执行状态
+                // alert(JSON.stringify(data));
+                if (status == 'success') {
+                    dataToExcel = data;    //返回结果为jsonArray
+                    exportFile();
+                } else {
+                    alert("获取结果失败。");
+                }
+            }
+        });
+    }
+
+    function exportFile() {
+        //1、XLSX.utils.json_to_sheet(data) 接收一个对象数组并返回一个基于对象关键字自动生成的“标题”的工作表，默认的列顺序由使用Object.keys的字段的第一次出现确定
+        //2、将数据放入对象workBook的Sheets中等待输出
+        workBook.Sheets['Sheet1'] = XLSX.utils.json_to_sheet(dataToExcel)
+
+        //3、XLSX.write() 开始编写Excel表格
+        //4、changeData() 将数据处理成需要输出的格式
+        saveAs(new Blob([changeData(XLSX.write(workBook, wopts))], {type: 'application/octet-stream'}))
+    }
+
+    function changeData(s) {
+        //如果存在ArrayBuffer对象(es6) 最好采用该对象
+        if (typeof ArrayBuffer !== 'undefined') {
+            //1、创建一个字节长度为s.length的内存区域
+            var buf = new ArrayBuffer(s.length);
+
+            //2、创建一个指向buf的Unit8视图，开始于字节0，直到缓冲区的末尾
+            var view = new Uint8Array(buf);
+
+            //3、返回指定位置的字符的Unicode编码
+            for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        } else {
+            var buf = new Array(s.length);
+            for (var i = 0; i != s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+    }
+
+    function saveAs(obj, fileName) {//当然可以自定义简单的下载文件实现方式
+        var tmpa = document.createElement("a");
+        tmpa.download = fileName || "下载.xlsx";
+        tmpa.href = URL.createObjectURL(obj); //绑定a标签
+        tmpa.click(); //模拟点击实现下载
+
+        setTimeout(function () { //延时释放
+            URL.revokeObjectURL(obj); //用URL.revokeObjectURL()来释放这个object URL
+        }, 100);
+    }
+    window.onbeforeunload = function () {
+        return "确认离开当前页面吗？未保存的数据将会丢失";
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>防水宝</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=IE9"/>
+    <meta http-equiv="Pragma" CONTENT="no-cache"/>
+    <meta http-equiv="Window-target" CONTENT="_top"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link th:href="@{/css/base.css}" rel="stylesheet" type="text/css"/>
+    <!--   <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}"/> -->
+    <link th:href="@{/css/main_style.css}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/function.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/Validform_style.css}"/>
+
+</head>
+
+<body>
+<form name="userInfo" id="mainform" method="post" enctype="multipart/form-data">
+
+    <!--位置-->
+    <!--<div class="ui-loc">-->
+    <!--<span>当前位置：用户管理 > 用户新增</span>-->
+    <!--</div>-->
+    <!--信息列表内容开始-->
+    <div class="ui-list fn-clear" style="height:300px;overflow-y: auto" id="dll">
+        <div class="formlist ui-wrap">
+            <div class="title fold-title"><img class="pd-l2 pd-r2" th:src="@{/images/fold2.png}"/><span
+                    th:text="'用户新增'"></span>
+            </div>
+            <div class="fold-cont" id="first_font">
+                <table class="ui-table ui-table-form table-fix">
+                    <colgroup>
+                        <!--注意用colgrounp标签组定义表格的每列宽度不可删除-->
+                        <col width="160"/>
+                        <col/>
+                        <col width="160"/>
+                        <col/>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th>登录名称</th>
+                        <td colspan="3"><input type="text" name="loginname" id="loginname" class="input-normal fn-left"
+                                               style="width: 50%" value="" datatype="*1-100" nullmsg="必填"
+                                               sucmsg="&nbsp;" errormsg="不超过100字符"/></td>
+                    </tr>
+                    <tr>
+                        <th>密码</th>
+                        <td colspan="3"><input type="password" name="password" id="password"
+                                               class="input-normal fn-left"
+                                               style="width: 50%" value="" datatype="*1-100" nullmsg="必填"
+                                               sucmsg="&nbsp;" errormsg="不超过100字符"/></td>
+                    </tr>
+                    <tr>
+                        <th>确认密码</th>
+                        <td colspan="3"><input placeholder="请再次填写新密码" onblur="validate()" type="password"
+                                               id="password2" class="input-normal fn-left"
+                                               style="width: 50%" value="" datatype="*1-100" nullmsg="必填"
+                                               sucmsg="&nbsp;" errormsg="不超过100字符"/></td>
+                        <span id="tishi"></span>
+                    </tr>
+                    <tr>
+                        <th>用户名称</th>
+                        <td colspan="3"><input type="text" name="username" id="username" class="input-normal fn-left"
+                                               style="width: 50%" value="" datatype="*1-100" nullmsg="必填"
+                                               sucmsg="&nbsp;" errormsg="不超过100字符"/></td>
+                    </tr>
+                    <tr>
+                        <th>用户角色</th>
+                        <td colspan="3">
+                            <!--<input type="text" name="userrole" id="userrole" class="input-normal fn-left"-->
+                            <!--style="width: 50%" value="" datatype="*1-100" nullmsg="必填"-->
+                            <!--sucmsg="&nbsp;" errormsg="不超过100字符"/>-->
+                            <select id="userrole" name="userrole" style="width: 15%"
+                                    class="input-select input-wdl fn-left" nullmsg="必填">
+                                <option value="0">管理员</option>
+                                <option value="1">脱敏用户</option>
+                                <option value="2">还原用户</option>
+                                <option value="3">脱敏及还原用户</option>
+                            </select>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    <!--信息列表内容结束-->
+    <!--保存方法一定要放到form里-->
+    <div class="fixbar-bottom f-cb">
+        <div class="f-fr btn-group">
+            <button class="f-fl btn btn-save" id="btn_sub" type="button">保存</button>
+
+        </div>
+    </div>
+</form>
+
+
+<script type="text/javascript" th:src="@{/js/jquery-1.11.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/tplbase.js}"></script>
+<script th:src="@{/js/layer/layer.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" th:src="@{/js/jquery-migrate-1.1.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/Validform_v5.3_min.js}"></script>
+<!-- <script type="text/javascript" th:src="@{/js/Validform_v5.3.js}"></script> -->
+<script th:src="@{/js/DatePicker/WdatePicker.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/js/jquery.SuperSlide.2.1.1.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" th:inline="javascript">
+
+    //tab切换
+    jQuery(".slideTabBox3").slide({
+        trigger: "click"
+    });
+    //折叠层效果
+    $(".fold-title").click(function () {
+        var status = $(this).next(".fold-cont").css("display");
+        if (status != "none") {
+            $(this).next(".fold-cont").slideUp();
+            $(this).find("img").css("transform", "rotate(180deg)");
+            flag2 = 0;
+        } else {
+            $(".fold-cont").not("#first_font").slideUp();
+            $(this).next(".fold-cont").slideDown();
+            $(this).find("img").css("transform", "rotate(0deg)");
+            flag2 = 1;
+        }
+    });
+
+    //弹层
+    $("#chooseform").click(function () {
+        layer.open({
+            type: 2,
+            title: "选择检查单",
+            area: ['420px', '240px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '' //iframe的url
+        });
+    })
+
+
+    //保存方法，包含校验数据
+    $("#mainform").Validform({//mainform  是写在form里的，意思校验整个form表单的内容
+        btnSubmit: "#btn_sub",//保存按钮的id,#+id=获取id
+
+        tiptype: 3,
+        showAllError: true,
+        ignoreHidden: true,
+        beforeCheck: function (curform) {
+            //在表单提交执行验证之前执行的函数，curform参数是当前表单对象。
+            //这里明确return false的话将不会继续执行验证操作;
+
+        },
+        beforeSubmit: function (curform) {
+            //在验证成功后，表单提交前执行的函数，curform参数是当前表单对象。
+            //这里明确return false的话表单将不会提交;
+
+        },
+        callback: function (form) {
+            var check = confirm("您确定要提交表单吗？");
+            if (check) {
+
+                userInfo.action = "/menuinfo/userInfo_insert";//保存的连接（后台的链接）
+                userInfo.submit();//必须与form的name一致
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        $("#nian").hide();
+        //$('#addLawType').combox({code:'d_law_type',blankValue:'添加',blankKey:''});
+    });
+    $('#addLawType').change(function () {
+        /* $(this).css({"border":"1px #b8d0d6 solid"});
+        $("#lawTypeIsNull").hide(); */
+        if ($(this).val()) {
+            addItemLaw($(this));
+            $(this).val("");
+        }
+
+    });
+
+    function validate() {
+
+        var pwd = $("#password").val();
+        var pwd1 = $("#password2").val();
+        <!-- 对比两次输入的密码 -->
+        if (pwd == pwd1) {
+            $("#tishi").html("两次密码相同");
+            $("#tishi").css("color", "green");
+            $("#xiugai").removeAttr("disabled");
+        }
+        else {
+            $("#tishi").html("两次密码不相同");
+            $("#tishi").css("color", "red")
+            $("button").attr("disabled", "disabled");
+        }
+    }
+
+</script>
+</body>
+
+</html>

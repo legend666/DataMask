@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--<DIV id=loading-->
+     <!--style="position:absolute; left:423px; top:261px; width:227px; height:20px; z-index:1">-->
+    <!--正在载入中,请稍等.....-->
+<!--</div>-->
+<div style="height: 40px; background-color: #c2e9ff; border-top:1px solid #000;border-bottom:1px solid #000">
+    <label>当前数据：</label>
+    <select id="connect" style="width: 15%">
+        <option value="" selected="selected">请选择连接</option>
+    </select>&nbsp;&nbsp;&nbsp;
+    <button id="btnConnect" style="margin-top: 8px; margin-left: 20px" onclick="conncet()" value="连接">连接</button>
+    <button id="btnDiscern" style="margin-left: 20px" value="智能识别">智能识别</button>
+    <!--<button id="btnSaveConfig" style="margin-left: 20px" value="保存设置" onclick="save()">保存设置</button>-->
+    <button id="btnCommit" style="margin-left: 20px" value="提交任务" onclick="task()">提交任务</button>
+</div>
+<div style="height: 800px">
+    <div id="leftDiv" style="height: 100%; float: left; width: 25%; background-color: #4297d7">
+        <table id="tables"></table>
+        <div id="pageuser"></div>
+    </div>
+    <div id="centerDiv" style="height: 100%; float: left; width: 50%; background-color: #4297d7">
+        <div id="cTopDiv" style="height: 60%; background-color: #4297d7">
+            <table id="column"></table>
+        </div>
+        <div id="cBottomDiv" style="height: 40%; background-color: #4297d7">
+            <table id="tableData"></table>
+            <table id="newtableData"></table>
+        </div>
+    </div>
+    <div id="rightDiv" style="height: 100%; float: left; width: 25%; background-color: #4297d7">
+        <table id="maskingList"></table>
+    </div>
+
+</div>
+<script type="text/javascript" th:src="@{/js/jquery-1.11.0.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/tplbase.js}"></script>
+<script th:src="@{/js/layer/layer.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" th:src="@{/js/jquery-migrate-1.1.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/Validform_v5.3_min.js}"></script>
+<script th:src="@{/js/DatePicker/WdatePicker.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/js/jquery.SuperSlide.2.1.1.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/js/auditing.js}" type="text/javascript" charset="utf-8"></script>
+<!-- jqGrid组件基础样式包-必要 -->
+<link rel="stylesheet" th:href="@{/css/ui.jqgrid.css}"/>
+<!-- jqGrid主题包-非必要 -->
+<!-- 在jqgrid/css/css这个目录下还有其他的主题包，可以尝试更换看效果 -->
+<link rel="stylesheet" th:href="@{/css/jquery-ui-1.8.16.custom.css}"/>
+<!-- jquery插件包-必要 -->
+<!-- 这个是所有jquery插件的基础，首先第一个引入 -->
+<script type="text/javascript" th:src="@{/js/jquery-1.7.1.js}"></script>
+<!-- jqGrid插件包-必要 -->
+<script type="text/javascript" th:src="@{/js/jquery.jqGrid.src.js}"></script>
+<!-- jqGrid插件的多语言包-非必要 -->
+<!-- 在jqgrid/js/i18n下还有其他的多语言包，可以尝试更换看效果 -->
+<script type="text/javascript" th:src="@{/js/i18n/grid.locale-cn.js}"></script>
+<title>http://blog.mn886.net/jqGrid</title>
+<!-- 本页面初始化用到的js包，创建jqGrid的代码就在里面 -->
+<script type="text/javascript" th:src="@{/js/tables.js}"></script>
+<script type="text/javascript" th:src="@{/js/tabledata.js}"></script>
+<script type="text/javascript" th:src="@{/js/column.js}"></script>
+<script type="text/javascript" th:src="@{/js/maskingList.js}"></script>
+<script>
+    $(document).ready(function () {
+        const url = "/display/getAllConnectName";
+        $.ajax({
+            type: "get",
+            url: url,//访问后台去数据库查询select的选项
+            success: function (connectname) {
+                const unitObj = document.getElementById("connect"); //页面上的<html:select>元素
+                if (connectname !== '' || connectname != null) { //后台传回来的select选项
+                    for (let i = 0; i < connectname.length; i++) {
+                        //遍历后台传回的结果，一项项往select中添加option
+                        unitObj.options.add(new Option(connectname[i]));
+                    }
+                }
+            },
+            error: function () {
+                alert('获取连接失败');
+            }
+        });
+
+    });
+
+    // $("#tableData").remove();
+    function conncet() {
+        const ConnectionName = jQuery("#connect  option:selected").text();
+        if (ConnectionName === '请选择连接') {
+            alert('请选择连接');
+        } else {
+            // document.getElementById('loading').style.visibility = 'visible';
+            $.ajax({
+                url: "/display/DbMetadata",
+                type: "POST",
+                timeout: "3000",
+                async: false,
+                contentType: "application/json",
+                data: ConnectionName,
+                success: function (data) {
+                    // document.getElementById('loading').style.visibility = 'hidden';
+                    const dataList = JSON.parse(data);
+                    const localData = {page: 1, total: 0, records: "0", rows: dataList};
+                    localData.rows = dataList;
+                    localData.records = dataList.length;
+                    localData.total = (dataList.length % 5 === 0) ? (dataList.length / 5) : (Math.floor(dataList.length / 5) + 1);
+                    const reader = {
+                        root: function () {
+                            return localData.rows;
+                        },
+                        page: function () {
+                            return localData.page;
+                        },
+                        total: function () {
+                            return localData.total;
+                        },
+                        records: function () {
+                            return localData.records;
+                        }, repeatitems: false
+                    };
+                    $("#tables").setGridParam({data: localData.rows, reader: reader}).trigger('reloadGrid');
+                    // $("#cBottomDiv").empty().append('<table id="tables"></table>');
+
+                    // const table = $("#gbox_column").clone();
+                    // alert(table);
+                    // $("#cBottomDiv").empty().append($("#gbox_column").clone());
+
+                    // $("#tables").jqGrid('clearGridData');  //清空表格
+                    // $("#tables").jqGrid('setGridParam', {  // 重新加载数据
+                    //     data: tabledata,   //  newdata 是符合格式要求的需要重新加载的数据
+                    // }).trigger("reloadGrid");
+                },
+                error: function () {
+                    alert('Error');
+                },
+            });
+        }
+
+    }
+
+    //同时保存到数据库
+    function save() {
+        //拿到grid对象
+        var obj = $("#maskingList");
+        //获取grid表中所有的rowid值
+        var rowIds = obj.getDataIDs();
+        //初始化一个数组arrayData容器，用来存放rowData
+        let Data = '';
+        if (rowIds.length > 0) {
+            for (var i = 0; i < rowIds.length; i++) {
+                //rowData=obj.getRowData(rowid);//这里rowid=rowIds[i];
+                const maskingColumn = obj.getRowData(rowIds[i]).maskingColumn;
+                const maskingRules = obj.getRowData(rowIds[i]).maskingRules;
+                const table = obj.getRowData(rowIds[i]).table;
+                Data = Data + table.toString() + "," + maskingColumn.toString() + "," + maskingRules.toString() + ";";
+            }
+        }
+        const ConnectionName = jQuery("#connect  option:selected").text();
+        $.ajax({
+            url: "/Masking/maskingData",
+            type: "POST",
+            timeout: "3000",
+            async: false,
+            traditional: true,
+            data: {maskingData: JSON.stringify(Data), ConnectionName: ConnectionName.toString()},
+            dataType: "json",
+            success: function () {
+                alert("任务提交成功");
+                jQuery("#maskingList").jqGrid("clearGridData");
+            },
+            error: function () {
+                alert('Error');
+            },
+        });
+    }
+
+    function task() {
+        //先保存
+        save();
+        //任务轮询
+        $.ajax({
+            url: "/Masking/MaskingSubmitTasks",
+            type: "POST",
+            timeout: "3000",
+            async: false,
+            contentType: "application/json",
+            data: JSON.stringify({}),    //参数传递为空
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("任务提交失败。");
+            },
+            success: function (data, status) {  //data:servlet返回数据，status:ajax执行状态
+                if (status == 'success') {
+                    alert("任务提交成功。")
+                } else {
+                    alert("任务提交失败。");
+                }
+            }
+        });
+    }
+
+    window.onbeforeunload = function () {
+        return "确认离开当前页面吗？未保存的数据将会丢失";
+    }
+
+</script>
+<script type="text/javascript" th:inline="javascript">
+</script>
+</html>

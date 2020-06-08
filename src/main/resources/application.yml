@@ -1,0 +1,32 @@
+server:
+  port: 8090
+spring:
+  thymeleaf:
+#    禁用缓存
+    cache: false
+    content-type: text/html
+    encoding: utf-8
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+  datasource:
+        username: sa
+        password: fsb
+        url: jdbc:h2:tcp://localhost/~/fsb;AUTO_SERVER=TRUE
+        driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  application:
+    name: inspection
+
+security:
+  basic:
+    enabled: false
+
+logging:
+  level:
+    cn.com.taiji.fsb: debug
+  file: ${spring.application.name}.log
+  path: ./logs

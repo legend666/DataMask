@@ -1,0 +1,138 @@
+/**
+*作者：焦凯旋
+*时间：2017-08-08
+*描述：
+**/
+.m-wrap {
+  width: 1086px;
+  margin: 0;
+}
+.m-wrapc {
+  padding: 0 30px;
+}
+.topbar {
+  background: #002d8a;
+}
+.topbar ul:before,
+.topbar ul:after {
+  content: " ";
+  display: table;
+}
+.topbar ul:after {
+  clear: both;
+}
+.topbar ul li {
+  display: block;
+  float: left;
+  height: 140px;
+  width: 16.66%;
+}
+.topbar ul li .txtWrap {
+  padding: 35px 0 0 50px;
+}
+.topbar ul li h1 {
+  color: #FFFFFF;
+  font-size: 36px;
+  font-weight: normal;
+  margin: 0 0 10px 0;
+}
+.topbar ul li h2 {
+  color: #73c2fd;
+  font-size: 16px;
+  font-weight: normal;
+}
+.topbar ul li.line {
+  background: url(../images/topbar_line.png) no-repeat right center;
+}
+.newsbar {
+  border: 1px solid #DDDDDD;
+}
+.newsbar:before,
+.newsbar:after {
+  content: " ";
+  display: table;
+}
+.newsbar:after {
+  clear: both;
+}
+.newsbar .newsbarc {
+  float: left;
+  width: 33.3%;
+  background: #FFFFFF;
+}
+.newsbar .newsbarc > .hd {
+  height: 37px;
+  line-height: 37px;
+  padding: 10px 0;
+  font-size: 18px;
+  color: #333333;
+}
+.newsbar .newsbarc > .bd {
+  padding: 10px 20px;
+}
+.newsbar .newsbarc.bg1 {
+  background: url(../images/newsbarc_bg1.png);
+  background-color: #FFFFFF;
+}
+.newsbar .newsbarc.bg2 {
+  background: #f2f5f8;
+}
+.newslist1 ul li {
+  padding: 0 0 0 15px;
+  background: url(../images/newslist_square.png) no-repeat left 10px;
+}
+.newslist1 ul li:before,
+.newslist1 ul li:after {
+  content: " ";
+  display: table;
+}
+.newslist1 ul li:after {
+  clear: both;
+}
+.newslist1 ul li .title {
+  float: left;
+  font-size: 14px;
+  color: #333333;
+  line-height: 25px;
+}
+.newslist1 ul li .date {
+  float: right;
+  margin: 10px 0;
+  font-size: 12px;
+  color: #FFFFFF;
+  padding: 5px 10px;
+  background: #91d9e6;
+}
+.newslist1 ul li .date.bg1 {
+  background: #96b5e9;
+}
+.newslist1 ul li .date.bg2 {
+  background: #aea9d5;
+}
+.newslist1 ul li.bg2 {
+  background: url(../images/newslist_square2.png) no-repeat left 10px;
+}
+.newslist1 ul li.bg3 {
+  background: url(../images/newslist_square3.png) no-repeat left 10px;
+}
+.newslist1 ul li.bdline {
+  border-bottom: 1px dashed #c1c7cf;
+}
+.table-grey {
+  border: 0;
+}
+.table-grey th {
+  color: #002d8a;
+  text-align: center;
+  font-weight: bold;
+  background: #eef1f4;
+}
+.table-grey td {
+  color: #333333;
+  background: #FFFFFF;
+}
+.page-grey .ui-page-next,
+.page-grey .ui-page-last,
+.page-grey .ui-button-go {
+  background: #014bb0;
+}

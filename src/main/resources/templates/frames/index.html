@@ -1,0 +1,181 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="utf-8"/>
+    <title>防水宝</title>
+    <meta http-equiv="Pragma" CONTENT="no-cache"/>
+    <meta http-equiv="Window-target" CONTENT="_top"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <!--                       css请不要改变调用顺序                       -->
+    <link th:href="@{/css/base.css}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/function.css}"/>
+    <link th:href="@{/css/sys_frames.css}" rel="stylesheet" type="text/css"/>
+    <!--                       Javascripts请不要改变调用顺序                       -->
+    <script type="text/javascript" th:src="@{/js/jquery-1.11.0.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/baseframe.js}"></script>
+    <!--菜单栏-->
+    <link th:href="@{/css/base.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/css/sys_frames.css}" rel="stylesheet" type="text/css"/>
+    <!--   <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}"/> -->
+    <link th:href="@{/css/main_style.css}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/function.css}"/>
+
+    <style type="text/css">
+        /*。deptright {*/
+
+        /*}*/
+
+    </style>
+</head>
+
+<body style="height: auto" scroll="no" onload="resizeFrame('subframe');resizeFrame('mainframe');"
+      onresize="resizeFramedbClick('subframe');resizeFramedbClick('mainframe');"><!--框架实时响应窗口变化-->
+
+<!--start header-->
+<div id="header" class="fn-clear">
+    <div class="topright fn-right f-cb">
+        <h4><img th:src="@{/images/headbg.png}"/><span
+                th:text="${session.SPRING_SECURITY_CONTEXT.authentication.principal.username}">某某某，您好！</span></h4>
+
+        <ul class="topnav fn-left">
+            <li><a href="javascript:logout()"><span class="">退出</span></a></li>
+        </ul>
+    </div>
+    <!--系统logo开始-->
+    <div id="logo"><img th:src="@{/images/earth.png}"/></div>
+    <!--系统logo结束-->
+</div>
+<div style="background-color:#80dbff" class="slideTabBox4">
+    <div class="hd">
+        <ul class="f-cb">
+            <a th:href="@{/indexinfo/index}" target="mainframe" class="no-thirdmenu">
+                <li class="on" group="aMenu" onclick="selectMenu(this)">数据脱敏</li>
+            </a>
+            <a th:href="@{/menuinfo/menuinfo_restore}" target="mainframe" class="no-thirdmenu">
+                <li group="aMenu" onclick="selectMenu(this)">数据还原</li>
+            </a>
+            <a th:href="@{/menuinfo/menuinfo_connect}" target="mainframe" class="no-thirdmenu">
+                <li group="aMenu" onclick="selectMenu(this)">连接管理</li>
+            </a>
+            <a th:href="@{/menuinfo/menuinfo_task}" target="mainframe" class="no-thirdmenu">
+                <li group="aMenu" onclick="selectMenu(this)">任务管理</li>
+            </a>
+            <a th:href="@{/menuinfo/menuinfo_user}" target="mainframe" class="no-thirdmenu">
+                <li group="aMenu" onclick="selectMenu(this)">用户管理</li>
+            </a>
+            <a th:href="@{/menuinfo/menuinfo_set}" target="mainframe" class="no-thirdmenu">
+                <li group="aMenu" onclick="selectMenu(this)">设置</li>
+            </a>
+            <a th:href="@{/menuinfo/menuinfo_help}" target="mainframe" class="no-thirdmenu">
+                <li group="aMenu" onclick="selectMenu(this)">帮助</li>
+            </a>
+        </ul>
+    </div>
+</div>
+<!--end header-->
+<!--mainbody-->
+<div id="container">
+    <!--主操作区域开始-->
+    <div id="col-main">
+        <iframe th:src="@{/indexinfo/index}" name="mainframe" width="100%" marginwidth="0" marginheight="0"
+                scrolling="yes" frameborder="0" id="mainframe"
+                onload="resizeFramedbClick('mainframe');"></iframe>
+    </div>  <!--主操作区域结束-->
+</div>
+<!--end mainbody-->
+</body>
+<script th:src="@{/js/auditing.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+
+    /*<![CDATA[*/
+    $(function () {
+        var browser = getBrowserInfo();
+
+        if (browser.toString().indexOf("chrome") != -1) {
+            $("#deptchange").css("left", "-80px");
+            $("#changeli").css("padding-top", "3px");
+        }
+    })
+
+    var flag = 1;
+    $(".fold img").click(
+        function () {
+            if (flag == 1) {
+                $(".col-sub").animate({width: "65px"}, 200);
+                $(".main-content").animate({margin: "0 0 0 65px"}, 200);
+                $(this).prev("span").hide();
+                $("iframe[name='subframe']").fadeOut();
+                flag = 0;
+            } else {
+                $(".col-sub").animate({width: "243px"}, 200);
+                $(".main-content").animate({margin: "0 0 0 243px"}, 200);
+                $(this).prev("span").show();
+                $("iframe[name='subframe']").fadeIn();
+                flag = 1;
+            }
+        }
+    )
+    //菜单浮层
+    $(".fold111111111177link").hover(function () {
+        $(this).find(".foldcont").fadeIn(200);
+    }, function () {
+        $(this).find(".foldcont").fadeOut(100);
+    })
+
+    function logout() {
+        if (confirm("确定要退出吗")) {
+            window.location.href = "/logout";
+            //window.close();
+        }
+    }
+
+    $("#de").change(function () {
+        var deptId = $(this).val();
+        window.location.href = "/yewuxuanze_main/" + deptId;
+    });
+
+    function getBrowserInfo() {
+        var agent = navigator.userAgent.toLowerCase();
+
+        var regStr_ie = /msie [\d.]+;/gi;
+        var regStr_ff = /firefox\/[\d.]+/gi
+        var regStr_chrome = /chrome\/[\d.]+/gi;
+        var regStr_saf = /safari\/[\d.]+/gi;
+        //IE
+        if (agent.indexOf("msie") > 0) {
+            return agent.match(regStr_ie);
+        }
+
+        //firefox
+        if (agent.indexOf("firefox") > 0) {
+            return agent.match(regStr_ff);
+        }
+
+        //Chrome
+        if (agent.indexOf("chrome") > 0) {
+            return agent.match(regStr_chrome);
+        }
+
+        //Safari
+        if (agent.indexOf("safari") > 0 && agent.indexOf("chrome") < 0) {
+            return agent.match(regStr_saf);
+        }
+
+    }
+
+    function selectMenu(obj) {
+        var eles = document.getElementsByTagName("li");
+        for (var i = 0; i < eles.length; i++) {
+            var e = eles[i];
+            var clsAttr = e.getAttribute["group"];
+            if (clsAttr = "aMenu") {
+                e.setAttribute("class", "redCls");
+            }
+            obj.setAttribute("class", "on");
+        }
+    }
+
+    /*]]>*/
+</script>
+</html>

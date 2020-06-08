@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>用户管理</title>
+    <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}" charset="UTF-8"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-ui.min.js}" charset="UTF-8"></script>
+    <script type="text/javascript" th:src="@{/js/i18n/grid.locale-cn.js}" charset="UTF-8"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.jqGrid.min.js}" charset="UTF-8"></script>
+    <link th:href="@{/css/jquery-ui.min.css}" rel="stylesheet" type="text/css" media="screen"/>
+    <link th:href="@{/css/jquery-ui.theme.min.css}" rel="stylesheet" type="text/css" media="screen"/>
+    <link th:href="@{/css/ui.jqgrid.css}" rel="stylesheet" type="text/css" media="screen"/>
+</head>
+<body>
+<style type="text/css">
+    body {
+        font-family: source-sans-pro;
+        background-color: #f2f2f2;
+        margin: 0px;
+        font-style: normal;
+        font-weight: 200;
+        /*height: 100%;*/
+    }
+</style>
+
+<div id="mainDiv" style="width: 100%; background-color: #FFFFFF; margin-left: auto; margin-right: auto;">
+    <div>
+        <table id="tusers"></table>
+        <div id="pageuser"></div>
+    </div>
+    <div id="dialog-pwd" style="display: none" title="ChangePassword">
+        <form id="pwdForm">
+            <input type="hidden" id="userIdForPwd" value=""/>
+            <table>
+                <tr id="trPwdForChange">
+                    <th>
+                        密 码：
+                    </th>
+                    <td>
+                        <input type="password" class="textField" id="passwordForChange" name="passwordForChange"/>
+                    </td>
+                </tr>
+                <tr id="trPwdcForChange">
+                    <th>
+                        确认密码：
+                    </th>
+                    <td>
+                        <input type="password" class="textField" id="pwdcForchange" name="pwdcForchange"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div id="dialog-user" style="display: none" title="UserManager">
+        <form id="userForm">
+            <input type="hidden" id="userid" value=""/>
+            <input type="hidden" id="dlgAction" value="add"/>
+            <table>
+                <tr>
+                    <th>
+                        用户名称：
+                    </th>
+                    <td>
+                        <input type="text" class="textField" id="username" name="username"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        登录账号：
+                    </th>
+                    <td>
+                        <input type="text" class="textField" id="loginname" name="loginname"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        功能角色：
+                    </th>
+                    <td>
+                        <select id="userrole" name="userrole">
+                            <option value="1">脱敏用户</option>
+                            <option value="2">还原用户</option>
+                            <option value="3">脱敏/还原用户</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr id="trPwd">
+                    <th>
+                        密 码：
+                    </th>
+                    <td>
+                        <input type="password" placeholder="请输入密码" class="textField" id="password" name="password"/>
+                    </td>
+                </tr>
+                <tr id="trPwdc">
+                    <th>
+                        确认密码：
+                    </th>
+                    <td>
+                        <input type="password" class="textField" id="pwdc" name="pwdc"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    Date.prototype.Format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
+    function resetDlg() {
+        $("#userForm").find('input[type=text],input[type=hidden],input[type=password]').each(function () {
+            $(this).val('');
+        });
+    }
+
+    function createUser() {
+        var dlg = $("#dialog-user");
+        var uname = $.trim(dlg.find("#username").val());
+        var ulogin = $.trim(dlg.find("#loginname").val());
+        var urole = $.trim(dlg.find("#userrole").val());
+        var upwd = $.trim(dlg.find("#password").val());
+        var upwdc = $.trim(dlg.find("#pwdc").val());
+        if (uname == '') {
+            alert("请输入用户名称。");
+            return;
+        }
+        if (ulogin == '') {
+            alert("请输入登录账号。");
+            return;
+        }
+        if (ulogin.toLocaleLowerCase() == 'admin') {
+            alert("登录账号已存在。");
+            return;
+        }
+        if (upwd == '') {
+            alert("请输入密码。");
+            return;
+        }
+        if (upwd != upwdc) {
+            alert("确认密码不相同。");
+            return;
+        }
+        var rowsall = $("#tusers").jqGrid('getRowData');
+        for (var i = 0; i < rowsall.length; i++) {
+            if (ulogin == rowsall[i].LoginName) {
+                alert("登录账号已存在。");
+                return;
+            }
+        }
+        var ctime = new Date().Format('yyyy-MM-dd hh:mm:ss');
+        var userData = {
+            'UserName': uname,
+            'LoginName': ulogin,
+            'UserRole': urole,
+            'Password': upwd,
+            'CreateTime': ctime
+        };
+        $.ajax({
+            type: "POST",
+            url: "/user/user_createUser",
+            timeout: "3000",
+            async: false,
+            contentType: "application/json",
+            data: JSON.stringify(userData),
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("用户添加失败。");
+            },
+            success: function (data, status) {  //data:servlet返回数据，status:ajax执行状态
+                if (status == 'success') {
+                    var jo = JSON.parse(data);
+                    if (jo.Result == "1") {
+                        $("#tusers").jqGrid('addRowData', jo.UserId, jo, 'first');
+                        var cid = jo.UserId;
+                        eb = "<a href='#' onclick = \"editEvent('" + cid + "');\">编辑</a>  ";
+                        db = "<a href='#' onclick = \"deleteEvent('" + cid + "');\">删除</a>";
+                        $("#tusers").jqGrid('setRowData', cid, {act: eb + db});
+                        alert("用户添加成功。");
+                        resetDlg();
+                        $("#dialog-user").dialog("close");
+                    } else {
+                        alert("用户添加失败。");
+                    }
+                } else {
+                    alert("用户添加失败。");
+                }
+            }
+        });
+    }
+
+    function updateUser(id) {
+        var dlg = $("#dialog-user");
+        var uid = $("#userid").val();
+        // alert(uid);
+        var uname = $.trim(dlg.find("#username").val());
+        // alert(uname);
+        var urole = $.trim(dlg.find("#userrole").val());
+        // alert(urole);
+        if (uname == '') {
+            alert("请输入用户名称。");
+            return;
+        }
+        var userData = {
+            'UserId': uid,
+            'UserName': uname,
+            'UserRole': urole
+        };
+        $.ajax({
+            type: "POST",
+            url: "/user/user_editUser",
+            timeout: "3000",
+            async: false,
+            contentType: "application/json",
+            data: JSON.stringify(userData),
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("用户修改失败。");
+            },
+            success: function (data, status) {  //data:servlet返回数据，status:ajax执行状态
+                if (status == 'success') {
+                    // alert(data);
+                    if (data == "1") {
+                        $("#tusers").jqGrid('setRowData', id, {'UserName': uname, 'UserRole': urole});
+                        alert("用户修改成功。");
+                        resetDlg();
+                        $("#dialog-user").dialog("close");
+                    } else {
+                        alert("用户修改失败。");
+                    }
+                } else {
+                    alert("用户修改失败。");
+                }
+            }
+        });
+    }
+
+    function deleteEvent(id) {
+        var ret = $("#tusers").jqGrid('getRowData', id);
+        if (confirm("删除\"" + ret.UserName + "\"?")) {
+            $.ajax({
+                url: "/user/user_deleteUserByUserId",
+                type: "POST",
+                timeout: "3000",
+                async: false,
+                contentType: "application/json",
+                data: JSON.stringify({"UserId": id}),
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("用户删除失败。");
+                },
+                success: function (data, status) {  //data:servlet返回数据，status:ajax执行状态
+                    if (status == 'success') {
+                        if (data == "1") {
+                            $("#tusers").jqGrid('delRowData', id);
+                            alert("用户删除成功。");
+                        } else {
+                            alert("用户删除失败。");
+                        }
+                    } else {
+                        alert("用户删除失败。");
+                    }
+                }
+            });
+        }
+    }
+
+    function editEvent(id) {
+        $("#loginname").attr('disabled', true);
+        $("#dlgAction").attr('value', 'edit');
+        $("#trPwd").hide();
+        $("#trPwdc").hide();
+        var userData = $("#tusers").jqGrid('getRowData', id);
+        $("#username").val(userData.UserName);
+        $("#loginname").val(userData.LoginName);
+        $("#userrole").val(userData.UserRole);
+        $("#userid").attr('value', id);
+        $("#dialog-user").dialog({
+            modal: true,
+            title: '编辑用户',
+            width: 370,
+            buttons: {
+                确定: function () {
+                    updateUser(id);
+                },
+                取消: function () {
+                    $(this).dialog("close");
+                    resetDlg();
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $.datepicker.regional['zh-CN'] = {
+            clearText: '清除',
+            clearStatus: '清除已选日期',
+            closeText: '关闭',
+            closeStatus: '不改变当前选择',
+            prevText: '< 上月',
+            prevStatus: '显示上月',
+            prevBigText: '<<',
+            prevBigStatus: '显示上一年',
+            nextText: '下月>',
+            nextStatus: '显示下月',
+            nextBigText: '>>',
+            nextBigStatus: '显示下一年',
+            currentText: '今天',
+            currentStatus: '显示本月',
+            monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            monthNamesShort: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+            monthStatus: '选择月份',
+            yearStatus: '选择年份',
+            weekHeader: '周',
+            weekStatus: '年内周次',
+            dayNames: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+            dayNamesShort: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+            dayNamesMin: ['日', '一', '二', '三', '四', '五', '六'],
+            dayStatus: '设置 DD 为一周起始',
+            dateStatus: '选择 m月 d日, DD',
+            dateFormat: 'yy-mm-dd',
+            firstDay: 1,
+            initStatus: '请选择日期',
+            isRTL: false
+        };
+        $.datepicker.setDefaults($.datepicker.regional['zh-CN']);
+        $(function () {
+            $("#datepicker").datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true,
+                showButtonPanel: true,
+                showOn: "both",
+                buttonImageOnly: true,
+                buttonImage: "calendar.gif",
+                buttonText: "",
+                changeMonth: true,
+                changeYear: true
+            });
+        });
+
+        $("#tusers").jqGrid({       //Grid设置
+            url: '/user/user_getAllUsers',
+            mtype: 'GET',
+            datatype: 'json',
+            loadonce: true,
+            height: '780px',//高度，表格高度。可为数值、百分比或'auto'
+            width: '100%',
+            colNames: ['操作', '用户编号', '用户名称', '登录账号', '功能角色', '密码', '创建时间'],
+            colModel: [
+                {name: 'act', width: 30, align: 'center', sortable: false, search: false},
+                {name: 'UserId', index: 'UserId', key: true, width: 40, hidden: true},
+                {name: 'UserName', index: 'UserName', width: 80, editable: true},
+                {name: 'LoginName', index: 'LoginName', width: 80, editable: true},
+                {
+                    name: 'UserRole',
+                    index: 'UserRole',
+                    width: 80,
+                    editable: true,
+                    formatter: 'select',
+                    stype: 'select',
+                    editoptions: {value: "1:脱敏用户;2:还原用户;3:脱敏/还原用户"}
+                },
+                {name: 'Password', width: 80, hidden: true, editable: true},
+                {
+                    name: 'CreateTime',
+                    index: 'CreateTime',
+                    width: 120,
+                    editable: true,
+                    formatter: 'date',
+                    formatoptions: {srcformat: 'Y-m-d H:i:s', newformat: 'Y-m-d H:i:s'},
+                    datefmt: 'yy-mm-dd H:i:s'
+                }
+            ],
+            celledit: true,
+            viewrecords: true,//是否在浏览导航栏显示记录总数
+            rowNum: 10000,//每页显示记录数
+            pager: '#pageuser',//分页、按钮所在的浏览导航栏
+            sortname: 'UserName',//默认的排序列名
+            pgbuttons: false,
+            pgtext: false,
+            //caption: "用户管理",//表名
+            autowidth: true, //自动宽
+            loadComplete: function () {
+                var ids = $("#tusers").jqGrid('getDataIDs');
+                for (var i = 0; i < ids.length; i++) {
+                    var cid = ids[i];
+                    eb = "<a href='#' onclick = \"editEvent('" + cid + "');\">编辑</a>  ";
+                    db = "<a href='#' onclick = \"deleteEvent('" + cid + "');\">删除</a>";
+                    $("#tusers").jqGrid('setRowData', cid, {act: eb + db});
+                }
+            }
+        });
+
+        var usernav = $("#tusers").jqGrid('navGrid', '#pageuser', {     //控制底部导航栏
+            add: false,
+            del: false,
+            edit: false,
+            search: false,
+            refresh: false,
+            position: 'left',
+            alerttext: "请选择用户"
+        });
+
+        $("#tusers").jqGrid('navButtonAdd', '#pageuser', {      //底部导航栏增加“创建用户”和“修改密码”
+            caption: "创建用户",
+            title: "创建用户",
+            buttonicon: "ui-icon-plusthick",
+            onClickButton: function () {
+                $("#dlgAction").attr('value', 'add');
+                $("#loginname").attr('disabled', false);
+                $("#trPwd").show();
+                $("#trPwdc").show();
+                $("#dialog-user").dialog({
+                    modal: true,
+                    title: '创建用户',
+                    width: 370,
+                    buttons: {
+                        '保存': function () {
+                            createUser();
+                        },
+                        '取消': function () {
+                            $(this).dialog("close");
+                            resetDlg();
+                        }
+                    }
+                });
+            }
+        });
+        usernav.navSeparatorAdd('#pageuser', {
+            sepclass: "ui-separator",
+            sepcontent: ""
+        });
+        usernav.navButtonAdd('#pageuser', {
+            caption: "修改密码",
+            title: "修改密码",
+            buttonicon: "ui-icon-key",
+            onClickButton: function () {
+                alert("Change Pwd");
+            }
+        });
+    });
+</script>
+</body>
+</html>

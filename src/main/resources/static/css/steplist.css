@@ -1,0 +1,128 @@
+.m-wrap {
+  width: 1086px;
+  margin: 0;
+  overflow-x: hidden;
+}
+.m-wrapc {
+  padding: 0 30px;
+}
+.ui-loc {
+  width: 100%;
+}
+.ui-loc span {
+  font-size: 14px;
+  color: #595959;
+}
+.slideTabBox .hd {
+  height: 50px;
+  line-height: 50px;
+  border: 1px solid #ddd;
+  position: relative;
+  background: url(../images/tabdec.png) no-repeat 1060px center;
+  background-color: #FFFFFF;
+}
+.slideTabBox .hd ul {
+  overflow: hidden;
+}
+.slideTabBox .hd ul li {
+  height: 50px;
+  width: 250px;
+  float: left;
+  cursor: pointer;
+  text-align: center;
+  border-right: 1px solid #ddd;
+  padding-left: 55px;
+}
+.slideTabBox .hd ul li.on {
+  height: 46px;
+  border-top: 4px solid #fea634;
+}
+.slideTabBox .hd ul li.zycz {
+  background: url(../images/zyoff.png) no-repeat 55px center;
+}
+.slideTabBox .hd ul li.zycz.on {
+  background: url(../images/zyon.png) no-repeat 55px center;
+}
+.slideTabBox .hd ul li.bjcz {
+  background: url(../images/bjoff.png) no-repeat 55px center;
+}
+.slideTabBox .hd ul li.bjcz.on {
+  background: url(../images/bjon.png) no-repeat 55px center;
+}
+.slideTabBox .bd .tabCont {
+  border: 1px solid #ddd;
+}
+.slideTabBox .bd .tabCont > .hdtit {
+  height: 50px;
+  line-height: 50px;
+  background-color: #e7f1fe;
+  text-align: center;
+  color: #002d8a;
+  font-size: 14px;
+  font-weight: bold;
+}
+.slideTabBox .bd .tabCont > .bdcont {
+  background: #FFFFFF;
+  padding: 20px 30px;
+}
+.radiogroup {
+  height: 36px;
+  line-height: 36px;
+  padding: 0px 30px;
+  background: #f4f9ff;
+  border: 1px dashed #cad3dc;
+  cursor: pointer;
+  margin-right: 30px;
+  margin-bottom: 20px;
+}
+.radiogroup .title {
+  font-size: 14px;
+  color: #333333;
+}
+.radiogroup select {
+  min-width: 140px;
+  border: 1px solid #cad3dc;
+  margin: 0 20px;
+}
+.radiogroup:hover,
+.radiogroup.on {
+  background: #FFF9DF;
+}
+.radiogroup:active {
+  border: 1px solid #cad3dc;
+  background: #f7efcc;
+}
+.radiogroup.wdfull {
+  width: 940px;
+}
+.btn-stepwrap {
+  margin-right: -30px;
+}
+.btn-stepwrap .btn-step {
+  display: block;
+  float: left;
+  margin-right: 30px;
+  width: 342px;
+  height: 80px;
+  line-height: 80px;
+}
+.btn-stepwrap .btn-step span {
+  font-size: 16px;
+  color: #002d8a;
+  padding-left: 160px;
+}
+.btn-stepwrap .btn-step.new {
+  background: url(../images/btn-new.png) no-repeat;
+}
+.btn-stepwrap .btn-step.extend {
+  background: url(../images/btn-extend.png) no-repeat;
+}
+.btn-stepwrap .btn-step.report {
+  background: url(../images/btn-report.png) no-repeat;
+}
+.showArea span {
+  font-size: 14px;
+  font-weight: normal;
+  color: #333333;
+  line-height: 25px;
+}
